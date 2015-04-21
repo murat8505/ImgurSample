@@ -6,5 +6,6 @@ a StaggeredGridLayoutManager.
 
 Supports Android 4.0+
 
+(this branch features some additional UI features such as ActionBar auto-hiding, etc.)
 
 

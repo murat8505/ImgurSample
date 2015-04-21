@@ -1,57 +1,55 @@
 package us.paulmarino.samples.android.imgursample.ui;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.support.v7.widget.RecyclerView;
 
 import butterknife.ButterKnife;
+import butterknife.InjectView;
 import us.paulmarino.samples.android.imgursample.R;
+import us.paulmarino.samples.android.imgursample.ui.widget.DrawShadowFrameLayout;
+import us.paulmarino.samples.android.imgursample.util.UIUtils;
 
-import static us.paulmarino.samples.android.imgursample.util.LogUtils.LOGW;
-import static us.paulmarino.samples.android.imgursample.util.LogUtils.makeLogTag;
+public class ImgurSampleActivity extends BaseActivity {
 
-public class ImgurSampleActivity extends ActionBarActivity {
-    private static final String TAG = makeLogTag(ImgurSampleActivity.class);
-
-    // Fade-in duration for the main content
-    private static final int MAIN_CONTENT_FADEIN_DURATION = 250;
-
-    // Toolbar
-    private Toolbar mActionbarToolbar;
+    @InjectView(R.id.main_content) DrawShadowFrameLayout mDrawShadowFrameLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_imgur);
 
-        getActionBarToolbar();
-    }
-
-    private Toolbar getActionBarToolbar() {
-        if (mActionbarToolbar == null) {
-            mActionbarToolbar = ButterKnife.findById(
-                    this, R.id.toolbar_actionbar);
-            if (mActionbarToolbar != null)
-                setSupportActionBar(mActionbarToolbar);
-        }
-        return mActionbarToolbar;
+        ButterKnife.inject(this);
     }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        fadeInMainContent();
+        RecyclerView recyclerView = ButterKnife.findById(this, R.id.recycler_view);
+        if (recyclerView != null)
+            enableActionBarAutoHide(recyclerView);
+
+        registerHideableHeaderView(findViewById(R.id.toolbar_actionbar));
     }
 
-    private void fadeInMainContent() {
-        View mainContent = ButterKnife.findById(this, R.id.main_content);
-        if (mainContent != null) {
-            mainContent.setAlpha(0);
-            mainContent.animate().alpha(1).setDuration(MAIN_CONTENT_FADEIN_DURATION);
-        } else {
-            LOGW(TAG, "No main_content view ID to fade in");
-        }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        updateToolbarShadowTopOffset();
+    }
+
+    /**
+     * Sets the header shadow drawable top offset (pre-L)
+     */
+    private void updateToolbarShadowTopOffset() {
+        int actionBarClearance = UIUtils.calculateActionBarSize(this);
+        mDrawShadowFrameLayout.setShadowTopOffset(actionBarClearance);
+    }
+
+    @Override
+    protected void onActionBarAutoShowOrHide(boolean shown) {
+        super.onActionBarAutoShowOrHide(shown);
+        mDrawShadowFrameLayout.setShadowVisible(shown, shown);
     }
 }

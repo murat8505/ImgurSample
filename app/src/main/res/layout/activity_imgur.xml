@@ -1,20 +1,24 @@
-<LinearLayout
+<us.paulmarino.samples.android.imgursample.ui.widget.DrawShadowFrameLayout
     android:id="@+id/main_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="false"
     android:fitsSystemWindows="true"
-    android:orientation="vertical"
+    app:shadowDrawable="@drawable/header_shadow"
     tools:context=".ui.ImgurSampleActivity">
 
-    <!-- Toolbar -->
-    <include layout="@layout/toolbar_actionbar_with_headerbar"/>
-
+    <!-- Imgur Fragment with RecyclerView -->
     <fragment
         android:id="@+id/imgur_fragment"
         android:name="us.paulmarino.samples.android.imgursample.ui.ImgurSampleFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_imgur"/>
-</LinearLayout>
+
+    <!-- Toolbar -->
+    <include layout="@layout/toolbar_actionbar_with_headerbar"/>
+
+</us.paulmarino.samples.android.imgursample.ui.widget.DrawShadowFrameLayout>

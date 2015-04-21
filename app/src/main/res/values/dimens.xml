@@ -25,6 +25,10 @@
     <dimen name="swipe_refresh_progress_bar_start_margin">-40dp</dimen>
     <dimen name="swipe_refresh_progress_bar_end_margin">16dp</dimen>
 
+    <!-- actionbar auto-hide -->
+    <dimen name="action_bar_auto_hide_min_y">152dp</dimen>
+    <dimen name="action_bar_auto_hide_sensivity">48dp</dimen>
+
     <!-- staggered grid layout -->
     <dimen name="grid_item_spacing">8dp</dimen>
 

@@ -28,6 +28,7 @@ import us.paulmarino.samples.android.imgursample.api.ImgurApiClient;
 import us.paulmarino.samples.android.imgursample.model.GalleryItem;
 import us.paulmarino.samples.android.imgursample.ui.widget.MultiSwipeRefreshLayout;
 import us.paulmarino.samples.android.imgursample.util.GalleryThumbnail;
+import us.paulmarino.samples.android.imgursample.util.UIUtils;
 
 import static us.paulmarino.samples.android.imgursample.util.LogUtils.LOGD;
 import static us.paulmarino.samples.android.imgursample.util.LogUtils.makeLogTag;
@@ -46,6 +47,8 @@ public class ImgurSampleFragment extends Fragment implements
 
     private GalleryAdapter mGalleryAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    private int mRecyclerViewTopClearance = 0;
 
     private ImgurApiClient mApiClient;
 
@@ -72,6 +75,8 @@ public class ImgurSampleFragment extends Fragment implements
         mApiClient.loadGallery(SUBREDDIT_CATEGORY_SPACE, this);
         setInitialRefreshProgress();
 
+        updateSwipeRefreshProgressBarTop();
+
         return v;
     }
 
@@ -97,9 +102,13 @@ public class ImgurSampleFragment extends Fragment implements
      */
     private void setupRecyclerView() {
         final Resources res = getResources();
-        int gridSpan = res.getInteger(R.integer.gallery_grid_columns);
+
+        // Set clearance for Toolbar
+        int actionBarClearance = UIUtils.calculateActionBarSize(getActivity());
+        setRecyclerViewTopClearance(actionBarClearance);
 
         // Layout Manager
+        int gridSpan = res.getInteger(R.integer.gallery_grid_columns);
         mLayoutManager = new StaggeredGridLayoutManager(gridSpan,
                 StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -113,6 +122,25 @@ public class ImgurSampleFragment extends Fragment implements
         mRecyclerView.addItemDecoration(new GalleryItemDecoration(itemSpacing));
     }
 
+    /**
+     * Sets appropriate clearance for header items (Toolbar, etc.).
+     */
+    private void setRecyclerViewTopClearance(int topClearance) {
+        if (mRecyclerView == null)
+            return;
+
+        if (mRecyclerViewTopClearance != topClearance) {
+            mRecyclerViewTopClearance = topClearance;
+
+            int paddingLeft = mRecyclerView.getPaddingLeft();
+            int paddingRight = mRecyclerView.getPaddingRight();
+            int paddingBottom = mRecyclerView.getPaddingBottom();
+
+            mRecyclerView.setPadding(paddingLeft, mRecyclerViewTopClearance,
+                    paddingRight, paddingBottom);
+        }
+    }
+
     private void setInitialRefreshProgress() {
         // Allows us to start refreshing without waiting for onMeasure
         mSwipeRefreshLayout.setProgressViewOffset(false, 0,
@@ -120,6 +148,19 @@ public class ImgurSampleFragment extends Fragment implements
                         getResources().getDisplayMetrics()));
 
         onRefreshingStateChanged(true);
+    }
+
+    private void updateSwipeRefreshProgressBarTop() {
+        if (mSwipeRefreshLayout == null)
+            return;
+
+        int progressBarStartMargin = getResources().getDimensionPixelSize(
+                R.dimen.swipe_refresh_progress_bar_start_margin);
+        int progressBarEndMargin = getResources().getDimensionPixelSize(
+                R.dimen.swipe_refresh_progress_bar_end_margin);
+        int top = mRecyclerViewTopClearance;
+        mSwipeRefreshLayout.setProgressViewOffset(false,
+                top + progressBarStartMargin, top + progressBarEndMargin);
     }
 
     @Override
@@ -130,10 +171,7 @@ public class ImgurSampleFragment extends Fragment implements
 
     @Override
     public boolean canSwipeRefreshChildScrollUp() {
-        if (mRecyclerView != null)
-            return ViewCompat.canScrollVertically(mRecyclerView, -1);
-
-        return false;
+        return mRecyclerView != null && ViewCompat.canScrollVertically(mRecyclerView, -1);
     }
 
     @Override
@@ -145,19 +183,7 @@ public class ImgurSampleFragment extends Fragment implements
         onRefreshingStateChanged(false);
         updateSwipeRefreshProgressBarTop();
 
-        LOGD(TAG, "onGalleryLoaded: items=" + data.size());
-    }
-
-    private void updateSwipeRefreshProgressBarTop() {
-        if (mSwipeRefreshLayout == null)
-            return;
-
-        int progressBarStartMargin = getResources().getDimensionPixelSize(
-                R.dimen.swipe_refresh_progress_bar_start_margin);
-        int progressBarEndMargin = getResources().getDimensionPixelSize(
-                R.dimen.swipe_refresh_progress_bar_end_margin);
-        mSwipeRefreshLayout.setProgressViewOffset(false,
-                progressBarStartMargin, progressBarEndMargin);
+        LOGD(TAG, "onGalleryLoaded: items=" + (data != null ? data.size() : "null"));
     }
 
     private void onRefreshingStateChanged(boolean refreshing) {
@@ -198,6 +224,8 @@ public class ImgurSampleFragment extends Fragment implements
             /*
              * Generate a thumbnail url here, instead of trying to load the
              * potentially large images as returned by "link" in the data response
+             *
+             * use GalleryThumbnail.SIZE_LARGE for higher resolution thumbnails.
              */
             final String thumbnailUrl = GalleryThumbnail.buildThumbnailRequestUrl(
                     item.id, GalleryThumbnail.SIZE_MEDIUM);
