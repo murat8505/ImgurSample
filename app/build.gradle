@@ -11,6 +11,7 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    
     buildTypes {
         release {
             minifyEnabled false
@@ -23,6 +24,13 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
 
+    lintOptions {
+        abortOnError false
+    }
+
+    aaptOptions {
+        noCompress 'apk'
+    }
 }
 
 dependencies {

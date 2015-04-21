@@ -10,6 +10,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,19 +64,13 @@ public class ImgurSampleFragment extends Fragment implements
         View v = inflater.inflate(R.layout.fragment_imgur, container, false);
         ButterKnife.inject(this, v);
 
+        // Configure Views
         setupSwipeRefresh();
         setupRecyclerView();
 
-        // Load Data
+        // Load Gallery Data
         mApiClient.loadGallery(SUBREDDIT_CATEGORY_SPACE, this);
-
-        // Set Progress (after a short delay to wait for onMeasure)
-        mSwipeRefreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                mSwipeRefreshLayout.setRefreshing(true);
-            }
-        });
+        setFirstRefreshProgress();
 
         return v;
     }
@@ -95,6 +90,19 @@ public class ImgurSampleFragment extends Fragment implements
 
             mSwipeRefreshLayout.setCanChildScrollUpCallback(this);
         }
+    }
+
+    private void updateSwipeRefreshProgressBarTop() {
+        if (mSwipeRefreshLayout == null) {
+            return;
+        }
+
+        int progressBarStartMargin = getResources().getDimensionPixelSize(
+                R.dimen.swipe_refresh_progress_bar_start_margin);
+        int progressBarEndMargin = getResources().getDimensionPixelSize(
+                R.dimen.swipe_refresh_progress_bar_end_margin);
+        mSwipeRefreshLayout.setProgressViewOffset(false,
+                progressBarStartMargin, progressBarEndMargin);
     }
 
     /**
@@ -118,6 +126,15 @@ public class ImgurSampleFragment extends Fragment implements
         mRecyclerView.addItemDecoration(new GalleryItemDecoration(itemSpacing));
     }
 
+    private void setFirstRefreshProgress() {
+        // Allows us to start refreshing without waiting for onMeasure
+        mSwipeRefreshLayout.setProgressViewOffset(false, 0,
+                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24,
+                        getResources().getDisplayMetrics()));
+
+        mSwipeRefreshLayout.setRefreshing(true);
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -139,6 +156,7 @@ public class ImgurSampleFragment extends Fragment implements
 
         // stop the refreshing
         onRefreshingStateChanged(false);
+        updateSwipeRefreshProgressBarTop();
 
         LOGD(TAG, "onGalleryLoaded: items=" + data.size());
     }
@@ -175,14 +193,14 @@ public class ImgurSampleFragment extends Fragment implements
             if (item == null)
                 return;
 
+            ((GalleryViewHolder) holder).galleryTitleText.setText(item.title);
+
             /*
              * Generate a thumbnail url here, instead of trying to load the
              * potentially large images as returned by "link" in the data response
              */
             final String thumbnailUrl = GalleryThumbnail.buildThumbnailRequestUrl(
                     item.id, GalleryThumbnail.SIZE_MEDIUM);
-
-            ((GalleryViewHolder) holder).galleryTitleText.setText(item.title);
 
             // load the thumbnail "cover" image
             Picasso.with(mContext)

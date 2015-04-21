@@ -1,7 +1,7 @@
 package us.paulmarino.samples.android.imgursample.model;
 
 /**
- * Created by pmarino on 4/20/15.
+ * Simple Model POJO
  */
 public class GalleryItem {
     public String id;
