@@ -70,7 +70,7 @@ public class ImgurSampleFragment extends Fragment implements
 
         // Load Gallery Data
         mApiClient.loadGallery(SUBREDDIT_CATEGORY_SPACE, this);
-        setFirstRefreshProgress();
+        setInitialRefreshProgress();
 
         return v;
     }
@@ -90,19 +90,6 @@ public class ImgurSampleFragment extends Fragment implements
 
             mSwipeRefreshLayout.setCanChildScrollUpCallback(this);
         }
-    }
-
-    private void updateSwipeRefreshProgressBarTop() {
-        if (mSwipeRefreshLayout == null) {
-            return;
-        }
-
-        int progressBarStartMargin = getResources().getDimensionPixelSize(
-                R.dimen.swipe_refresh_progress_bar_start_margin);
-        int progressBarEndMargin = getResources().getDimensionPixelSize(
-                R.dimen.swipe_refresh_progress_bar_end_margin);
-        mSwipeRefreshLayout.setProgressViewOffset(false,
-                progressBarStartMargin, progressBarEndMargin);
     }
 
     /**
@@ -126,13 +113,13 @@ public class ImgurSampleFragment extends Fragment implements
         mRecyclerView.addItemDecoration(new GalleryItemDecoration(itemSpacing));
     }
 
-    private void setFirstRefreshProgress() {
+    private void setInitialRefreshProgress() {
         // Allows us to start refreshing without waiting for onMeasure
         mSwipeRefreshLayout.setProgressViewOffset(false, 0,
                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24,
                         getResources().getDisplayMetrics()));
 
-        mSwipeRefreshLayout.setRefreshing(true);
+        onRefreshingStateChanged(true);
     }
 
     @Override
@@ -159,6 +146,18 @@ public class ImgurSampleFragment extends Fragment implements
         updateSwipeRefreshProgressBarTop();
 
         LOGD(TAG, "onGalleryLoaded: items=" + data.size());
+    }
+
+    private void updateSwipeRefreshProgressBarTop() {
+        if (mSwipeRefreshLayout == null)
+            return;
+
+        int progressBarStartMargin = getResources().getDimensionPixelSize(
+                R.dimen.swipe_refresh_progress_bar_start_margin);
+        int progressBarEndMargin = getResources().getDimensionPixelSize(
+                R.dimen.swipe_refresh_progress_bar_end_margin);
+        mSwipeRefreshLayout.setProgressViewOffset(false,
+                progressBarStartMargin, progressBarEndMargin);
     }
 
     private void onRefreshingStateChanged(boolean refreshing) {
