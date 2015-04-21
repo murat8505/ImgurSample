@@ -130,10 +130,7 @@ public class ImgurSampleFragment extends Fragment implements
 
     @Override
     public boolean canSwipeRefreshChildScrollUp() {
-        if (mRecyclerView != null)
-            return ViewCompat.canScrollVertically(mRecyclerView, -1);
-
-        return false;
+        return mRecyclerView != null && ViewCompat.canScrollVertically(mRecyclerView, -1);
     }
 
     @Override
@@ -145,7 +142,7 @@ public class ImgurSampleFragment extends Fragment implements
         onRefreshingStateChanged(false);
         updateSwipeRefreshProgressBarTop();
 
-        LOGD(TAG, "onGalleryLoaded: items=" + data.size());
+        LOGD(TAG, "onGalleryLoaded: items=" + (data != null ? data.size() : "null"));
     }
 
     private void updateSwipeRefreshProgressBarTop() {
