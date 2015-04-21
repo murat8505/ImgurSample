@@ -174,6 +174,7 @@ public class ImgurSampleFragment extends Fragment implements
 
         public GalleryAdapter(Context context) {
             mContext = context;
+            mGalleryItems = new ArrayList<>();
         }
 
         @Override
