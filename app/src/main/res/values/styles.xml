@@ -1,0 +1,7 @@
+<resources>
+    <!-- Empty Views -->
+    <style name="EmptyText">
+        <item name="android:textSize">@dimen/text_size_medium</item>
+        <item name="android:textColor">@color/body_text_disabled</item>
+    </style>
+</resources>

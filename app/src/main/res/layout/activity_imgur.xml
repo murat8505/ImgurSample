@@ -1,0 +1,20 @@
+<LinearLayout
+    android:id="@+id/main_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:context=".ui.ImgurSampleActivity">
+
+    <!-- Toolbar -->
+    <include layout="@layout/toolbar_actionbar_with_headerbar"/>
+
+    <fragment
+        android:id="@+id/imgur_fragment"
+        android:name="us.paulmarino.samples.android.imgursample.ui.ImgurSampleFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_imgur"/>
+</LinearLayout>

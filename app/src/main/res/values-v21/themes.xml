@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme" parent="FrameworkRoot.Theme" />
+
+    <style name="Theme.Example" parent="Theme.ImgurSample.Base">
+        <item name="android:navigationBarColor">#000</item>
+        <item name="android:statusBarColor">?colorPrimaryDark</item>
+
+        <item name="android:alertDialogTheme">@style/Theme.ImgurSample.AlertDialog</item>
+    </style>
+
+    <style name="Theme.ImgurSample.AlertDialog" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorPrimary">@color/theme_primary</item>
+        <item name="android:colorPrimaryDark">@color/theme_primary_dark</item>
+        <item name="android:colorAccent">@color/theme_accent_1</item>
+    </style>
+</resources>
