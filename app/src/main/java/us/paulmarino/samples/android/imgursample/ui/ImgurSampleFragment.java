@@ -10,7 +10,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,12 +68,15 @@ public class ImgurSampleFragment extends Fragment implements
         setupRecyclerView();
 
         // Load Gallery Data
-        mApiClient.loadGallery(SUBREDDIT_CATEGORY_SPACE, this);
-        setInitialRefreshProgress();
+        mApiClient.loadGallery(SUBREDDIT_CATEGORY_SPACE, ImgurSampleFragment.this);
+        onRefreshingStateChanged(true);
 
         return v;
     }
 
+    /**
+     * Configure SwipeRefreshLayout colors and listeners
+     */
     private void setupSwipeRefresh() {
         if (mSwipeRefreshLayout != null) {
             mSwipeRefreshLayout.setColorSchemeResources(
@@ -89,7 +91,24 @@ public class ImgurSampleFragment extends Fragment implements
             });
 
             mSwipeRefreshLayout.setCanChildScrollUpCallback(this);
+
+            setSwipeRefreshTopClearance();
         }
+    }
+
+    /**
+     * Sets the margins for the {@link SwipeRefreshLayout}. This is a
+     * workaround since onMeasure is called after setRefreshing.
+     * This allows us to see the progress circle on first load.
+     */
+    private void setSwipeRefreshTopClearance() {
+        int progressBarStartMargin = getResources().getDimensionPixelSize(
+                R.dimen.swipe_refresh_progress_bar_start_margin);
+        int progressBarEndMargin = getResources().getDimensionPixelSize(
+                R.dimen.swipe_refresh_progress_bar_end_margin);
+
+        mSwipeRefreshLayout.setProgressViewOffset(false,
+                progressBarStartMargin, progressBarEndMargin);
     }
 
     /**
@@ -113,15 +132,6 @@ public class ImgurSampleFragment extends Fragment implements
         mRecyclerView.addItemDecoration(new GalleryItemDecoration(itemSpacing));
     }
 
-    private void setInitialRefreshProgress() {
-        // Allows us to start refreshing without waiting for onMeasure
-        mSwipeRefreshLayout.setProgressViewOffset(false, 0,
-                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24,
-                        getResources().getDisplayMetrics()));
-
-        onRefreshingStateChanged(true);
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -138,23 +148,9 @@ public class ImgurSampleFragment extends Fragment implements
         mGalleryAdapter.setGalleryItems(data);
         mGalleryAdapter.notifyDataSetChanged();
 
-        // stop the refreshing
         onRefreshingStateChanged(false);
-        updateSwipeRefreshProgressBarTop();
 
         LOGD(TAG, "onGalleryLoaded: items=" + (data != null ? data.size() : "null"));
-    }
-
-    private void updateSwipeRefreshProgressBarTop() {
-        if (mSwipeRefreshLayout == null)
-            return;
-
-        int progressBarStartMargin = getResources().getDimensionPixelSize(
-                R.dimen.swipe_refresh_progress_bar_start_margin);
-        int progressBarEndMargin = getResources().getDimensionPixelSize(
-                R.dimen.swipe_refresh_progress_bar_end_margin);
-        mSwipeRefreshLayout.setProgressViewOffset(false,
-                progressBarStartMargin, progressBarEndMargin);
     }
 
     private void onRefreshingStateChanged(boolean refreshing) {
@@ -179,9 +175,7 @@ public class ImgurSampleFragment extends Fragment implements
             View itemView = LayoutInflater.from(mContext)
                     .inflate(R.layout.list_item_gallery, parent, false);
 
-            GalleryViewHolder holder = new GalleryViewHolder(itemView);
-
-            return holder;
+            return new GalleryViewHolder(itemView);
         }
 
         @Override
@@ -195,6 +189,8 @@ public class ImgurSampleFragment extends Fragment implements
             /*
              * Generate a thumbnail url here, instead of trying to load the
              * potentially large images as returned by "link" in the data response
+             *
+             * use GalleryThumbnail.SIZE_LARGE for higher resolution thumbnails
              */
             final String thumbnailUrl = GalleryThumbnail.buildThumbnailRequestUrl(
                     item.id, GalleryThumbnail.SIZE_MEDIUM);

@@ -1,7 +1,7 @@
 package us.paulmarino.samples.android.imgursample.ui;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
@@ -11,7 +11,7 @@ import us.paulmarino.samples.android.imgursample.R;
 import static us.paulmarino.samples.android.imgursample.util.LogUtils.LOGW;
 import static us.paulmarino.samples.android.imgursample.util.LogUtils.makeLogTag;
 
-public class ImgurSampleActivity extends ActionBarActivity {
+public class ImgurSampleActivity extends AppCompatActivity {
     private static final String TAG = makeLogTag(ImgurSampleActivity.class);
 
     // Fade-in duration for the main content
