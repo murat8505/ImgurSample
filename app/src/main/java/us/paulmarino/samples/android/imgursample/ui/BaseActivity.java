@@ -1,7 +1,7 @@
 package us.paulmarino.samples.android.imgursample.ui;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -19,7 +19,7 @@ import static us.paulmarino.samples.android.imgursample.util.LogUtils.makeLogTag
 /**
  * Base activity for adding some general features and tweaks
  */
-public abstract class BaseActivity extends ActionBarActivity {
+public abstract class BaseActivity extends AppCompatActivity {
     private static final String TAG = makeLogTag(BaseActivity.class);
 
     // Animation Duration
@@ -36,6 +36,11 @@ public abstract class BaseActivity extends ActionBarActivity {
     private boolean mActionBarShown = true;
 
     private ArrayList<View> mHideableHeaderViews = new ArrayList<>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -79,13 +84,14 @@ public abstract class BaseActivity extends ActionBarActivity {
         if (lm == null)
             return;
 
-        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             final static int ITEMS_THRESHOLD = 3;
             int lastFirstVisibleItem = 0;
             int[] firstVisibleItems = new int[lm.getSpanCount()];
 
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) { }
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            }
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -97,7 +103,7 @@ public abstract class BaseActivity extends ActionBarActivity {
                         lastFirstVisibleItem - firstVisibleItems[0] > 0
                                 ? Integer.MIN_VALUE
                                 : lastFirstVisibleItem == firstVisibleItems[0]
-                                        ? 0 : Integer.MAX_VALUE
+                                ? 0 : Integer.MAX_VALUE
                 );
                 lastFirstVisibleItem = firstVisibleItems[0];
             }

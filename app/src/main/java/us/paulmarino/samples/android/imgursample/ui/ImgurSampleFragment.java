@@ -10,7 +10,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,20 +65,60 @@ public class ImgurSampleFragment extends Fragment implements
                              ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_imgur, container, false);
         ButterKnife.inject(this, v);
+        updateContentTopClearance();
 
-        // Configure Views
+        // Configure views
         setupSwipeRefresh();
         setupRecyclerView();
 
-        // Load Gallery Data
+        // Load gallery data and set progress
         mApiClient.loadGallery(SUBREDDIT_CATEGORY_SPACE, this);
-        setInitialRefreshProgress();
-
-        updateSwipeRefreshProgressBarTop();
+        onRefreshingStateChanged(true);
 
         return v;
     }
 
+    /**
+     * Sets proper margins to take into account our Toolbar
+     * or other header views.
+     */
+    private void updateContentTopClearance() {
+        int actionBarClearance = UIUtils.calculateActionBarSize(getActivity());
+        int gridSpacing = getResources().getDimensionPixelSize(R.dimen.grid_item_spacing);
+
+        setRecyclerViewTopClearance(actionBarClearance);
+        setSwipeRefreshTopClearance(actionBarClearance + gridSpacing);
+    }
+
+    private void setRecyclerViewTopClearance(int topClearance) {
+        if (mRecyclerView == null)
+            return;
+
+        if (mRecyclerViewTopClearance != topClearance) {
+            mRecyclerViewTopClearance = topClearance;
+
+            int paddingLeft = mRecyclerView.getPaddingLeft();
+            int paddingRight = mRecyclerView.getPaddingRight();
+            int paddingBottom = mRecyclerView.getPaddingBottom();
+
+            mRecyclerView.setPadding(paddingLeft, mRecyclerViewTopClearance,
+                    paddingRight, paddingBottom);
+        }
+    }
+
+    private void setSwipeRefreshTopClearance(int topClearance) {
+        if (mSwipeRefreshLayout == null)
+            return;
+
+        int progressBarEndMargin = getResources().getDimensionPixelSize(
+                R.dimen.swipe_refresh_progress_bar_end_margin);
+        mSwipeRefreshLayout.setProgressViewOffset(false,
+                0, topClearance + progressBarEndMargin);
+    }
+
+    /**
+     * Configure SwipeRefresh colors and listeners
+     */
     private void setupSwipeRefresh() {
         if (mSwipeRefreshLayout != null) {
             mSwipeRefreshLayout.setColorSchemeResources(
@@ -103,10 +142,6 @@ public class ImgurSampleFragment extends Fragment implements
     private void setupRecyclerView() {
         final Resources res = getResources();
 
-        // Set clearance for Toolbar
-        int actionBarClearance = UIUtils.calculateActionBarSize(getActivity());
-        setRecyclerViewTopClearance(actionBarClearance);
-
         // Layout Manager
         int gridSpan = res.getInteger(R.integer.gallery_grid_columns);
         mLayoutManager = new StaggeredGridLayoutManager(gridSpan,
@@ -120,47 +155,6 @@ public class ImgurSampleFragment extends Fragment implements
         // Decoration (Margins)
         int itemSpacing = res.getDimensionPixelSize(R.dimen.grid_item_spacing);
         mRecyclerView.addItemDecoration(new GalleryItemDecoration(itemSpacing));
-    }
-
-    /**
-     * Sets appropriate clearance for header items (Toolbar, etc.).
-     */
-    private void setRecyclerViewTopClearance(int topClearance) {
-        if (mRecyclerView == null)
-            return;
-
-        if (mRecyclerViewTopClearance != topClearance) {
-            mRecyclerViewTopClearance = topClearance;
-
-            int paddingLeft = mRecyclerView.getPaddingLeft();
-            int paddingRight = mRecyclerView.getPaddingRight();
-            int paddingBottom = mRecyclerView.getPaddingBottom();
-
-            mRecyclerView.setPadding(paddingLeft, mRecyclerViewTopClearance,
-                    paddingRight, paddingBottom);
-        }
-    }
-
-    private void setInitialRefreshProgress() {
-        // Allows us to start refreshing without waiting for onMeasure
-        mSwipeRefreshLayout.setProgressViewOffset(false, 0,
-                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24,
-                        getResources().getDisplayMetrics()));
-
-        onRefreshingStateChanged(true);
-    }
-
-    private void updateSwipeRefreshProgressBarTop() {
-        if (mSwipeRefreshLayout == null)
-            return;
-
-        int progressBarStartMargin = getResources().getDimensionPixelSize(
-                R.dimen.swipe_refresh_progress_bar_start_margin);
-        int progressBarEndMargin = getResources().getDimensionPixelSize(
-                R.dimen.swipe_refresh_progress_bar_end_margin);
-        int top = mRecyclerViewTopClearance;
-        mSwipeRefreshLayout.setProgressViewOffset(false,
-                top + progressBarStartMargin, top + progressBarEndMargin);
     }
 
     @Override
@@ -181,7 +175,6 @@ public class ImgurSampleFragment extends Fragment implements
 
         // stop the refreshing
         onRefreshingStateChanged(false);
-        updateSwipeRefreshProgressBarTop();
 
         LOGD(TAG, "onGalleryLoaded: items=" + (data != null ? data.size() : "null"));
     }
@@ -208,9 +201,7 @@ public class ImgurSampleFragment extends Fragment implements
             View itemView = LayoutInflater.from(mContext)
                     .inflate(R.layout.list_item_gallery, parent, false);
 
-            GalleryViewHolder holder = new GalleryViewHolder(itemView);
-
-            return holder;
+            return new GalleryViewHolder(itemView);
         }
 
         @Override
