@@ -2,7 +2,7 @@
 <resources>
     <style name="Theme" parent="FrameworkRoot.Theme" />
 
-    <style name="Theme.Example" parent="Theme.ImgurSample.Base">
+    <style name="Theme.ImgurSample" parent="Theme.ImgurSample.Base">
         <item name="android:navigationBarColor">#000</item>
         <item name="android:statusBarColor">?colorPrimaryDark</item>
 
