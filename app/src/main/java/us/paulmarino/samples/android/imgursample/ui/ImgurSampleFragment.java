@@ -43,6 +43,7 @@ public class ImgurSampleFragment extends Fragment implements
 
     @InjectView(R.id.swipe_refresh) MultiSwipeRefreshLayout mSwipeRefreshLayout;
     @InjectView(R.id.recycler_view) RecyclerView mRecyclerView;
+    @InjectView(R.id.error_view) View mErrorView;
 
     private GalleryAdapter mGalleryAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -129,6 +130,7 @@ public class ImgurSampleFragment extends Fragment implements
                 @Override
                 public void onRefresh() {
                     mApiClient.loadGallery(SUBREDDIT_CATEGORY_SPACE, ImgurSampleFragment.this);
+                    hideNetworkErrorView();
                 }
             });
 
@@ -144,8 +146,8 @@ public class ImgurSampleFragment extends Fragment implements
 
         // Layout Manager
         int gridSpan = res.getInteger(R.integer.gallery_grid_columns);
-        mLayoutManager = new StaggeredGridLayoutManager(gridSpan,
-                StaggeredGridLayoutManager.VERTICAL);
+        mLayoutManager = new StaggeredGridLayoutManager(
+                gridSpan, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // Adapter
@@ -176,12 +178,39 @@ public class ImgurSampleFragment extends Fragment implements
         // stop the refreshing
         onRefreshingStateChanged(false);
 
+        hideNetworkErrorView();
+
         LOGD(TAG, "onGalleryLoaded: items=" + (data != null ? data.size() : "null"));
     }
+
+    @Override
+    public void onGalleryLoadError() {
+        mGalleryAdapter.setGalleryItems(null);
+        mGalleryAdapter.notifyDataSetChanged();
+
+        showNetworkErrorView();
+    }
+
+    /**
+     * UTILITY METHODS ************************
+     */
 
     private void onRefreshingStateChanged(boolean refreshing) {
         if (mSwipeRefreshLayout != null)
             mSwipeRefreshLayout.setRefreshing(refreshing);
+    }
+
+    private void showNetworkErrorView() {
+        if (mErrorView != null) {
+            mErrorView.setVisibility(View.VISIBLE);
+
+            onRefreshingStateChanged(false);
+        }
+    }
+
+    private void hideNetworkErrorView() {
+        if (mErrorView != null)
+            mErrorView.setVisibility(View.GONE);
     }
 
     /**

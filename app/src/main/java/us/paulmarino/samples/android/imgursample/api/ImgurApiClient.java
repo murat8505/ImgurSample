@@ -33,6 +33,7 @@ public class ImgurApiClient {
      */
     public interface GalleryLoadedListener {
         void onGalleryLoaded(ArrayList<GalleryItem> data);
+        void onGalleryLoadError();
     }
 
     /**
@@ -78,8 +79,9 @@ public class ImgurApiClient {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         LOGD(TAG, "Error retrieving gallery items");
-                        if (listener != null)
-                            listener.onGalleryLoaded(null);
+                        if (listener != null) {
+                            listener.onGalleryLoadError();
+                        }
                     }
                 },
                 true

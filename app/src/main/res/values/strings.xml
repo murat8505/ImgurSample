@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ImgurSample</string>
+
+    <!-- error messages -->
+    <string name="error_connection_issue">Sorry, error loading gallery.</string>
+    <string name="error_swipe_to_retry">Swipe down to retry.</string>
 </resources>

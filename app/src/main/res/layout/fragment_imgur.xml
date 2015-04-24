@@ -8,12 +8,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Our RecyclerView for Gallery Items -->
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_view"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"/>
+            android:layout_height="match_parent">
+
+            <!-- Error/Empty Content Layout -->
+            <include layout="@layout/include_error_layout"/>
+
+            <!-- Our RecyclerView for Gallery Items -->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"/>
+
+        </FrameLayout>
 
     </us.paulmarino.samples.android.imgursample.ui.widget.MultiSwipeRefreshLayout>
 

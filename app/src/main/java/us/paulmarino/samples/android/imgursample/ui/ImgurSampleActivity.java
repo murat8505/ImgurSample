@@ -29,7 +29,7 @@ public class ImgurSampleActivity extends BaseActivity {
         if (recyclerView != null)
             enableActionBarAutoHide(recyclerView);
 
-        registerHideableHeaderView(findViewById(R.id.toolbar_actionbar));
+        registerHideableHeaderView(ButterKnife.findById(this, R.id.toolbar_actionbar));
     }
 
     @Override

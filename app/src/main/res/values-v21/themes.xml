@@ -2,7 +2,7 @@
 <resources>
     <style name="Theme" parent="FrameworkRoot.Theme" />
 
-    <style name="Theme.Example" parent="Theme.ImgurSample.Base">
+    <style name="Theme.ImgurSample" parent="Theme.ImgurSample.Base">
         <item name="android:navigationBarColor">#000</item>
         <item name="android:statusBarColor">?colorPrimaryDark</item>
 
@@ -14,4 +14,5 @@
         <item name="android:colorPrimaryDark">@color/theme_primary_dark</item>
         <item name="android:colorAccent">@color/theme_accent_1</item>
     </style>
+
 </resources>
